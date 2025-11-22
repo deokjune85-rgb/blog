@@ -71,12 +71,14 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # ---------------------------------------
 # 1. API 및 엔진 초기화
 # ---------------------------------------
+# API 키를 직접 여기에 넣거나 사이드바에서 입력받기
+API_KEY = "AIzaSyCuLmFhL_Px2WX9LQ_4wVHrctzaXs8q_4w"  # 여기에 직접 넣음
+
 try:
-    API_KEY = st.secrets["GOOGLE_API_KEY"]
     genai.configure(api_key=API_KEY)
     model = genai.GenerativeModel("models/gemini-1.5-flash")
-except:
-    st.error("❌ API 키 오류. secrets.toml을 확인하라.")
+except Exception as e:
+    st.error(f"❌ API 키 오류: {str(e)}")
     st.stop()
 
 # ---------------------------------------
