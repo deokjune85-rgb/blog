@@ -435,7 +435,7 @@ if generate_btn:
                 st.info(style_dna)
         with col2:
             with st.expander("🧠 적용된 핵심 공리"):
-                st.info(core_logic_text)
+                st.info(core_logic)
             
         # 2. 글 생성
         with st.spinner("✍️ 핵심 공리 기반 포스팅 작성 중... (체류시간 + 위장술 최적화)"):
