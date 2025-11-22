@@ -1,7 +1,3 @@
-오케이, 통째로 정리해서 줄게요.
-`blog_data_sample.txt`를 기본 DNA로 쓰고, 업로드 파일은 선택 옵션으로 섞는 버전입니다.
-
-```python
 # =====================================================
 # 📝 IMD BLOG-SMITH v1.0 — 네이버 상위노출 글 공장
 # Authorized by: The Architect
