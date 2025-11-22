@@ -74,7 +74,7 @@ st.markdown(custom_css, unsafe_allow_html=True)
 try:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
     genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel("models/gemini-2.5-flash") # 최신 모델 사용
+    model = genai.GenerativeModel("models/gemini-1.5-flash")
 except:
     st.error("❌ API 키 오류. secrets.toml을 확인하라.")
     st.stop()
