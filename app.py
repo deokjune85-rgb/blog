@@ -87,18 +87,35 @@ except Exception as e:
 
 # RAG 데이터 로딩
 def load_rag_data():
+    file_path = '/home/claude/blog_data_sample.txt'
     try:
-        with open('/home/claude/blog_data_sample.txt', 'r', encoding='utf-8') as f:
-            return f.read()
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read().strip()
+            return content if content else None
     except FileNotFoundError:
+        print(f"파일을 찾을 수 없음: {file_path}")
+        return None
+    except UnicodeDecodeError:
+        print(f"인코딩 에러: {file_path}")
+        try:
+            with open(file_path, 'r', encoding='cp949') as f:
+                content = f.read().strip()
+                return content if content else None
+        except:
+            return None
+    except Exception as e:
+        print(f"기타 에러: {e}")
         return None
 
 # 핵심 공리 로딩  
 def load_core_logic():
+    file_path = '/home/claude/core_logic.txt'
     try:
-        with open('/home/claude/core_logic.txt', 'r', encoding='utf-8') as f:
-            return f.read()
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read().strip()
+            return content if content else None
     except FileNotFoundError:
+        print(f"핵심 공리 파일 없음: {file_path}")
         return """
         핵심 공리: 감정적 공감 → 전문성 어필 → 법적 안전성 강조 → 자연스러운 상담 유도
         
@@ -108,6 +125,9 @@ def load_core_logic():
         4. 직접 촬영 이미지만 사용 (OCR 함정 회피)
         5. 알고리즘을 속이되, 독자는 만족시켜라
         """
+    except Exception as e:
+        print(f"핵심 공리 로딩 에러: {e}")
+        return None
 
 # 데이터 로딩
 rag_data = load_rag_data()
@@ -119,13 +139,20 @@ with st.sidebar:
     st.markdown("---")
     
     st.subheader("📊 시스템 상태")
-    if rag_data:
-        st.success(f"✅ RAG 데이터 로드됨 ({len(rag_data):,}자)")
-    else:
-        st.error("❌ RAG 데이터 없음")
     
-    if core_logic:
+    # RAG 데이터 상태
+    if rag_data and len(rag_data) > 100:
+        st.success(f"✅ RAG 데이터 로드됨 ({len(rag_data):,}자)")
+        st.caption(f"📄 첫 50자: {rag_data[:50]}...")
+    else:
+        st.error("❌ RAG 데이터 없음 - blog_data_sample.txt 확인 필요")
+        if rag_data:
+            st.warning(f"데이터가 너무 짧음: {len(rag_data) if rag_data else 0}자")
+    
+    # 핵심 공리 상태  
+    if core_logic and len(core_logic) > 50:
         st.success("✅ 핵심 공리 로드됨")
+        st.caption(f"📝 8대 공리 시스템 적용")
     else:
         st.warning("⚠️ 기본 공리 사용")
     
