@@ -6,6 +6,11 @@ import streamlit as st
 import google.generativeai as genai
 import time
 import random
+import os
+
+# 현재 작업 디렉토리 확인 및 설정
+current_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(current_dir)
 
 # ---------------------------------------
 # 0. [UI/UX] 시스템 설정 (Dark & Creator Mode)
@@ -87,14 +92,20 @@ except Exception as e:
 
 # RAG 데이터 로딩
 def load_rag_data():
-    file_path = '/home/claude/blog_data_sample.txt'
+    file_path = 'blog_data_sample.txt'
+    
+    # 파일 존재 확인
+    if not os.path.exists(file_path):
+        print(f"❌ 파일이 존재하지 않음: {file_path}")
+        print(f"현재 디렉토리: {os.getcwd()}")
+        print(f"디렉토리 내 파일들: {os.listdir('.')}")
+        return None
+    
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read().strip()
+            print(f"✅ RAG 데이터 로드 성공: {len(content)}자")
             return content if content else None
-    except FileNotFoundError:
-        print(f"파일을 찾을 수 없음: {file_path}")
-        return None
     except UnicodeDecodeError:
         print(f"인코딩 에러: {file_path}")
         try:
@@ -109,13 +120,10 @@ def load_rag_data():
 
 # 핵심 공리 로딩  
 def load_core_logic():
-    file_path = '/home/claude/core_logic.txt'
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read().strip()
-            return content if content else None
-    except FileNotFoundError:
-        print(f"핵심 공리 파일 없음: {file_path}")
+    file_path = 'core_logic.txt'
+    
+    if not os.path.exists(file_path):
+        print(f"❌ 핵심 공리 파일이 존재하지 않음: {file_path}")
         return """
         핵심 공리: 감정적 공감 → 전문성 어필 → 법적 안전성 강조 → 자연스러운 상담 유도
         
@@ -125,6 +133,12 @@ def load_core_logic():
         4. 직접 촬영 이미지만 사용 (OCR 함정 회피)
         5. 알고리즘을 속이되, 독자는 만족시켜라
         """
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read().strip()
+            print(f"✅ 핵심 공리 로드 성공: {len(content)}자")
+            return content if content else None
     except Exception as e:
         print(f"핵심 공리 로딩 에러: {e}")
         return None
