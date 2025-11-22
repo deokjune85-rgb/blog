@@ -232,6 +232,55 @@ def analyze_investigation_style(text_data):
     except:
         return "흥신소 상위 노출 글들의 패턴: 감정적 공감 → 전문성 어필 → 법적 안전성 강조 → 자연스러운 상담 유도 구조로 작성한다."
 
+def analyze_core_logic(core_logic_text):
+    """핵심 공리에서 실제 규칙들을 추출"""
+    rules = {
+        'forbidden_words': [],
+        'required_structure': [],
+        'keyword_rules': [],
+        'length_rules': '',
+        'tone_rules': []
+    }
+    
+    lines = core_logic_text.split('\n')
+    for line in lines:
+        if '금지' in line or '절대' in line:
+            rules['forbidden_words'].append(line.strip())
+        elif '글자' in line or '분량' in line:
+            rules['length_rules'] = line.strip()
+        elif '구조' in line or '단계' in line:
+            rules['required_structure'].append(line.strip())
+        elif '키워드' in line:
+            rules['keyword_rules'].append(line.strip())
+        elif '톤' in line or '어조' in line:
+            rules['tone_rules'].append(line.strip())
+    
+    return rules
+
+def extract_rag_patterns(rag_data):
+    """RAG 데이터에서 성공 패턴 추출"""
+    patterns = {
+        'opening_styles': [],
+        'structure_patterns': [],
+        'closing_styles': [],
+        'keyword_usage': []
+    }
+    
+    # RAG 데이터를 문단별로 분석
+    paragraphs = rag_data.split('\n\n')
+    
+    for para in paragraphs[:10]:  # 처음 10개 문단만 분석
+        if len(para) > 50:
+            # 시작 패턴 추출 (첫 50자)
+            opening = para[:50] + "..."
+            patterns['opening_styles'].append(opening)
+            
+            # 키워드 사용 패턴 찾기
+            if '흥신소' in para or '탐정' in para:
+                patterns['keyword_usage'].append(para[:100])
+    
+    return patterns
+
 def create_template_from_rag(keyword, sub_kw, tone):
     """RAG 데이터 기반으로 안전한 템플릿 생성"""
     
@@ -277,7 +326,54 @@ def create_template_from_rag(keyword, sub_kw, tone):
     
     return template
 
-def generate_investigation_post(style_instruction, keyword, sub_kw, tone, core_logic):
+def generate_investigation_post(style_instruction, keyword, sub_kw, tone, core_logic_text):
+    """핵심 공리와 RAG 데이터를 실제로 분석하여 적용하는 글 생성 시스템"""
+    
+    # 1. 핵심 공리 분석
+    logic_rules = analyze_core_logic(core_logic_text)
+    
+    # 2. RAG 데이터 패턴 추출  
+    if rag_data:
+        rag_patterns = extract_rag_patterns(rag_data)
+    else:
+        rag_patterns = {'opening_styles': [], 'structure_patterns': [], 'closing_styles': [], 'keyword_usage': []}
+    
+    # 3. 핵심 공리 기반 프롬프트 구성
+    prompt = f"""
+네이버 블로그 상위노출을 위한 전문 글을 작성해주세요.
+
+=== 반드시 준수해야 할 핵심 공리 ===
+{chr(10).join(logic_rules['forbidden_words'][:5])}
+{logic_rules['length_rules']}
+{chr(10).join(logic_rules['required_structure'][:3])}
+
+=== RAG 성공 패턴 적용 ===
+시작 스타일 참고: {rag_patterns['opening_styles'][0] if rag_patterns['opening_styles'] else '개인적 경험담으로 시작'}
+
+=== 작성 요구사항 ===
+주제: {keyword}
+키워드: {sub_kw} 
+톤: {tone}
+
+구조:
+1. 개인적 경험담 도입 (제1공리: 의도 일치)
+2. 문제 상황 공감대 형성 (체류시간 확보)  
+3. 해결 과정 상세 설명 (전문성 어필)
+4. 만족스러운 결과 (신뢰성 구축)
+5. 자연스러운 추천 (상담 유도)
+
+금지사항:
+- 2분할 포스팅 구조 절대 금지
+- 제목 키워드 반복 금지  
+- 과도한 감정 표현 금지
+- 상업적 냄새 직접 표현 금지
+
+1500자 이상으로 제목과 본문을 작성해주세요.
+"""
+
+    # 4. 키워드 의도 분석
+    commercial_keywords = ["흥신소", "탐정사무소", "민간조사", "증거수집", "외도조사"]
+    is_commercial = any(ck in keyword for ck in commercial_keywords)
     """
     무한 변주 프로토콜이 적용된 최종 글 생성 시스템
     """
