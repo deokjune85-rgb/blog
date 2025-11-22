@@ -82,30 +82,52 @@ except Exception as e:
     st.stop()
 
 # ---------------------------------------
-# 2. [사이드바] 데이터 주입 및 설정
+# 2. [데이터 로딩] DNA 주입 및 핵심 공리 로딩
 # ---------------------------------------
+
+# RAG 데이터 로딩
+def load_rag_data():
+    try:
+        with open('/home/claude/blog_data_sample.txt', 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        return None
+
+# 핵심 공리 로딩  
+def load_core_logic():
+    try:
+        with open('/home/claude/core_logic.txt', 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        return """
+        핵심 공리: 감정적 공감 → 전문성 어필 → 법적 안전성 강조 → 자연스러운 상담 유도
+        
+        1. 체류시간 = 생존의 열쇠 (전화번호 하단 배치)
+        2. 위장술 = 가상 의뢰인 경험담으로 작성
+        3. 키워드는 감정 뒤에 숨겨라
+        4. 직접 촬영 이미지만 사용 (OCR 함정 회피)
+        5. 알고리즘을 속이되, 독자는 만족시켜라
+        """
+
+# 데이터 로딩
+rag_data = load_rag_data()
+core_logic = load_core_logic()
+
 with st.sidebar:
     st.title("🔍 BLOG-SMITH v2.0")
     st.caption("Investigation Services Specialist")
     st.markdown("---")
     
-    st.subheader("1️⃣ DNA 주입 (RAG Data)")
-    uploaded_file = st.file_uploader("상위노출 글 모음 (.txt)", type=["txt"])
+    st.subheader("📊 시스템 상태")
+    if rag_data:
+        st.success(f"✅ RAG 데이터 로드됨 ({len(rag_data):,}자)")
+    else:
+        st.error("❌ RAG 데이터 없음")
     
-    st.markdown("---")
-    st.subheader("🧠 핵심 공리 (Core Logic)")
-    core_logic_file = st.file_uploader("블로그 작성 핵심 원칙 (.txt)", type=["txt"], key="core_logic")
-    
-    # 기본 핵심 공리 (파일 없을 때 사용)
-    default_core_logic = """
-    핵심 공리: 감정적 공감 → 전문성 어필 → 법적 안전성 강조 → 자연스러운 상담 유도
-    
-    1. 체류시간 = 생존의 열쇠 (전화번호 하단 배치)
-    2. 위장술 = 가상 의뢰인 경험담으로 작성
-    3. 키워드는 감정 뒤에 숨겨라
-    4. 직접 촬영 이미지만 사용 (OCR 함정 회피)
-    5. 알고리즘을 속이되, 독자는 만족시켜라
-    """
+    if core_logic:
+        st.success("✅ 핵심 공리 로드됨")
+    else:
+        st.warning("⚠️ 기본 공리 사용")
     
     st.markdown("---")
     st.subheader("2️⃣ 타겟 설정")
@@ -356,19 +378,12 @@ with col3:
     """, unsafe_allow_html=True)
 
 if generate_btn:
-    if not uploaded_file:
-        st.error("❌ 훈련 데이터(txt)가 없습니다. 상위 노출 흥신소 글을 업로드하세요.")
+    if not rag_data:
+        st.error("❌ 훈련 데이터(txt)가 없습니다. blog_data_sample.txt 파일을 확인하세요.")
     else:
-        # 핵심 공리 로드
-        if core_logic_file:
-            core_logic_text = core_logic_file.read().decode("utf-8")
-        else:
-            core_logic_text = default_core_logic
-            
         # 1. 데이터 로드 및 분석
         with st.spinner("🔍 흥신소 글 패턴 분석 중... (법적 안전성 + 감정 어필 구조 학습)"):
-            raw_text = uploaded_file.read().decode("utf-8")
-            style_dna = analyze_investigation_style(raw_text)
+            style_dna = analyze_investigation_style(rag_data)
             time.sleep(2) # 연출용 딜레이
         
         st.success("✅ 흥신소 특화 스타일 분석 완료! 핵심 공리 적용 시작...")
@@ -383,7 +398,7 @@ if generate_btn:
             
         # 2. 글 생성
         with st.spinner("✍️ 핵심 공리 기반 포스팅 작성 중... (체류시간 + 위장술 최적화)"):
-            blog_post = generate_investigation_post(style_dna, keyword, sub_keywords, tone, core_logic_text)
+            blog_post = generate_investigation_post(style_dna, keyword, sub_keywords, tone, core_logic)
             time.sleep(2)
             
         # 3. 결과 출력
