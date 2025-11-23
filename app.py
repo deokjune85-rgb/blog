@@ -65,7 +65,7 @@ try:
     API_KEY = "AIzaSyCuLmFhL_Px2WX9LQ_4wVHrctzaXs8q_4w"
     
     genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
+    model = genai.GenerativeModel("models/gemini-2.0-flash")
 
 except Exception as e:
     st.error(f"❌ 엔진 초기화 실패: {str(e)}")
