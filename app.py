@@ -62,7 +62,7 @@ st.markdown(custom_css, unsafe_allow_html=True)
 try:
     # [수정됨] secrets.toml 찾지 말고 그냥 여기에 키를 박아버린다.
     # 네놈이 아까 말한 키다. 만약 바뀌었으면 여기만 수정해라.
-    API_KEY = "AIzaSyCuLmFhL_Px2WX9LQ_4wVHrctzaXs8q_4w"
+    API_KEY = "AIzaSyCgdtjDnoxKSeNEGtJBw3JrYWUSovDjK6o"
     
     genai.configure(api_key=API_KEY)
     model = genai.GenerativeModel("models/gemini-2.0-flash")
